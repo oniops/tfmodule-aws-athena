@@ -1,5 +1,5 @@
-
 locals {
+  create_athena      = var.create
   name_prefix        = var.context.name_prefix
   tags               = var.context.tags
   work_group         = "${local.name_prefix}-${var.work_group}"
@@ -7,7 +7,8 @@ locals {
 }
 
 resource "aws_athena_workgroup" "this" {
-  name = format("%s-athwg", local.work_group)
+  count = local.create_athena ? 1 : 0
+  name  = format("%s-athwg", local.work_group)
 
   configuration {
     enforce_workgroup_configuration    = var.enforce_workgroup_configuration

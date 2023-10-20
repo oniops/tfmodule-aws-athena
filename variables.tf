@@ -1,3 +1,8 @@
+variable "create" {
+  type    = bool
+  default = true
+}
+
 variable "work_group" {
   description = "The name of workgroup"
   type = string
