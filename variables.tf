@@ -55,9 +55,13 @@ variable "s3_expected_bucket_owner" {
 }
 
 variable "encryption_option" {
-  description = "Whether Amazon S3 server-side encryption with Amazon S3-managed keys (SSE_S3), server-side encryption with KMS-managed keys (SSE_KMS), or client-side encryption with KMS-managed keys (CSE_KMS) is used."
   type        = string
   default     = null
+  description = <<EOF
+Whether Amazon S3 server-side encryption with Amazon S3-managed keys (SSE_S3),
+  server-side encryption with KMS-managed keys (SSE_KMS),
+  or client-side encryption with KMS-managed keys (CSE_KMS) is used.
+EOF
 }
 
 variable "kms_key_arn" {
