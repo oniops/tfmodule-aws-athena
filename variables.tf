@@ -5,7 +5,7 @@ variable "create" {
 
 variable "work_group" {
   description = "The name of workgroup"
-  type = string
+  type        = string
 }
 
 variable "enforce_workgroup_configuration" {
@@ -74,4 +74,10 @@ variable "enabled_s3_acl_option" {
   description = "Whether enabled s3 acl option, if true s3_acl_option' will set `BUCKET_OWNER_FULL_CONTROL`"
   type        = bool
   default     = false
+}
+
+variable "additional_tags" {
+  description = "Additional tags for all resources"
+  type        = map(string)
+  default     = {}
 }
