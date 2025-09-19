@@ -1,7 +1,7 @@
 locals {
   create_athena      = var.create
   name_prefix        = var.context.name_prefix
-  tags               = var.context.tags
+  tags               = merge(var.context.tags, var.additional_tags)
   work_group         = "${local.name_prefix}-${var.work_group}"
   enabled_encryption = var.encryption_option == "SSE_S3" ? true : var.encryption_option != null && var.kms_key_arn != null ? true : false
 }
