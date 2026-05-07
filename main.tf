@@ -1,14 +1,25 @@
 locals {
-  create_athena      = var.create
-  name_prefix        = var.context.name_prefix
-  tags               = merge(var.context.tags, var.additional_tags)
-  work_group         = "${local.name_prefix}-${var.work_group}"
-  enabled_encryption = var.encryption_option == "SSE_S3" ? true : var.encryption_option != null && var.kms_key_arn != null ? true : false
+  create_athena = var.create
+  name_prefix   = var.context.name_prefix
+  tags          = var.context.tags
+  work_group    = "${local.name_prefix}-${var.work_group}"
+
+  enabled_encryption = (
+    var.encryption_option == "SSE_S3"
+    || (contains(["SSE_KMS", "CSE_KMS"], coalesce(var.encryption_option, "")) && var.kms_key_arn != null)
+  )
 }
 
 resource "aws_athena_workgroup" "this" {
   count = local.create_athena ? 1 : 0
   name  = format("%s-athwg", local.work_group)
+
+  lifecycle {
+    precondition {
+      condition     = !contains(["SSE_KMS", "CSE_KMS"], coalesce(var.encryption_option, "")) || var.kms_key_arn != null
+      error_message = "kms_key_arn is required when encryption_option is SSE_KMS or CSE_KMS."
+    }
+  }
 
   configuration {
     enforce_workgroup_configuration    = var.enforce_workgroup_configuration
@@ -27,8 +38,8 @@ resource "aws_athena_workgroup" "this" {
       dynamic "encryption_configuration" {
         for_each = local.enabled_encryption ? ["true"] : []
         content {
-          encryption_option = try(var.encryption_option, "SSE_S3")
-          kms_key_arn       = try(var.kms_key_arn, null)
+          encryption_option = var.encryption_option
+          kms_key_arn       = var.kms_key_arn
         }
       }
 

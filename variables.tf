@@ -29,14 +29,11 @@ variable "bytes_scanned_cutoff_per_query" {
   description = "Integer for the upper data usage limit (cutoff) for the amount of bytes a single query in a workgroup is allowed to scan. Must be at least 10485760."
   type        = number
   default     = null
-}
 
-
-# see - https://docs.aws.amazon.com/athena/latest/ug/engine-versions.html
-variable "engine_version" {
-  description = "Configuration block for the Athena Engine Versioning."
-  type        = string
-  default     = "AUTO"
+  validation {
+    condition     = var.bytes_scanned_cutoff_per_query == null || var.bytes_scanned_cutoff_per_query >= 10485760
+    error_message = "bytes_scanned_cutoff_per_query must be at least 10485760 (10MB)."
+  }
 }
 
 variable "s3_output_location" {
@@ -62,6 +59,11 @@ Whether Amazon S3 server-side encryption with Amazon S3-managed keys (SSE_S3),
   server-side encryption with KMS-managed keys (SSE_KMS),
   or client-side encryption with KMS-managed keys (CSE_KMS) is used.
 EOF
+
+  validation {
+    condition     = var.encryption_option == null || contains(["SSE_S3", "SSE_KMS", "CSE_KMS"], coalesce(var.encryption_option, ""))
+    error_message = "encryption_option must be one of: SSE_S3, SSE_KMS, CSE_KMS."
+  }
 }
 
 variable "kms_key_arn" {
